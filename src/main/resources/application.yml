@@ -1,0 +1,92 @@
+server:
+  port: 8090
+---
+
+
+spring:
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+  profile: default
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://keycloak.com/auth/realms/onelabs-realm/protocol/openid-connect/certs
+  auth:
+    url: https://keycloak.unreleased.work
+    userId: admin
+    password: ilove2code
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: ${vcap.services.eureka.credentials.url:https://}
+  instance:
+    securePort: 443
+    securePortEnabled: true
+    hostname: ${vcap.application.uris[0]:eureka}
+
+keycloak:
+  realm: onelabs-realm
+  auth-server-url: https://keycloak.com/auth/realms/onelabs-realm/protocol/openid-connect/auth
+  ssl-required: external
+  bearer-only: true
+  resource: onelabs-apps
+  use-resource-role-mappings: true
+
+
+
+---
+spring:
+  logging:
+    level:
+      ROOT: DEBUG
+  profiles: local
+  auth:
+    url: https://keycloak.unreleased.work
+    userId: admin
+    password: ilove2code
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+
+---
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  profiles: dev, local, default
+  #  jpa:
+  #    hibernate:
+  #      ddl-auto: create
+  #    generate-ddl: true
+  #    show-sql: true
+  #  datasource:
+  #    database: MYSQL
+  #    url: jdbc:mysql://mysql.unreleased.work/interviewdb
+  #    driverClassName: com.mysql.jdbc.Driver
+  #    username: root
+  #    password: ilove2code
+  h2:
+    console:
+      enabled: true
+  datasource:
+    platform: h2
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+#logging:
+#  level:
+#    ROOT: DEBUG

@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.3.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
+	id 'org.sonarqube' version '2.7'
 }
 
 group = 'com.example'
@@ -11,6 +12,34 @@ sourceCompatibility = '11'
 repositories {
 	mavenCentral()
 }
+
+configurations {
+	itestImplementation.extendsFrom testImplementation
+	itestRuntime.extendsFrom runtime
+	stestImplementation.extendsFrom testImplementation
+	stestRuntime.extendsFrom runtime
+	htmlDocs
+}
+
+sourceSets {
+	itest {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file('src/itest/java')
+		}
+		resources.srcDir file('src/test/itest/resources')
+	}
+	stest{
+		java {
+			compileClasspath += main.output
+			runtimeClasspath += main.output
+			srcDir file('src/stest/java')
+		}
+		resources.srcDir file('src/stest/resources')
+	}
+}
+
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -22,6 +51,52 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-oauth2-core'
+	implementation 'org.springframework.security:spring-security-oauth2-client'
+	implementation 'org.springframework.security:spring-security-oauth2-jose'
+	implementation 'org.springframework.security:spring-security-oauth2-resource-server'
+	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') {
+		exclude group: 'org.springframework.security', module: 'spring-security-rsa'
+	}
+
+
+	implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+
+
+	implementation 'io.springfox:springfox-swagger2:3.0.0-SNAPSHOT'
+	implementation 'io.springfox:springfox-swagger-ui:3.0.0-SNAPSHOT'
+	implementation 'io.springfox:springfox-data-rest:3.0.0-SNAPSHOT'
+
+	implementation 'org.springframework.hateoas:spring-hateoas'
+	implementation group: 'com.h2database', name: 'h2', version: '1.4.197'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.powermock:powermock-api-mockito2:1.7.4'
+
+	//new
+	implementation group: 'org.springframework.boot' , name: 'spring-boot-starter-actuator'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-config'
+	implementation(group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version:'2.3.4.RELEASE') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-test'
+	}
+
+	itestImplementation 'org.springframework.boot:spring-boot-starter-test'
+	itestImplementation 'org.powermock:powermock-api-mockito2:1.7.4'
+
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+
+	implementation 'junit:junit:4.12'
+
+	itestImplementation sourceSets.main.output
+	itestImplementation sourceSets.test.output
+	itestImplementation configurations.testImplementation
+	itestRuntime configurations.runtime
+
+	stestImplementation sourceSets.main.output
+	stestImplementation sourceSets.test.output
+	stestImplementation configurations.testImplementation
+	stestRuntime configurations.runtime
 }
 
 test {
